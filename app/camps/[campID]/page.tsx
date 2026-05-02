@@ -1,17 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
 type PageProps = {
-  params: Promise<{
-    campId: string;
-  }>;
+  params: Promise<Record<string, string>>;
 };
 
 export default async function CampPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const campId = resolvedParams.campId;
+  const campId = Object.values(resolvedParams)[0];
 
   if (!campId) {
-    return <div className="p-6">Missing camp ID from URL.</div>;
+    return (
+      <div className="p-6">
+        <h1>Missing camp ID from URL.</h1>
+        <pre>{JSON.stringify(resolvedParams, null, 2)}</pre>
+      </div>
+    );
   }
 
   const supabase = createClient(
@@ -40,6 +43,7 @@ export default async function CampPage({ params }: PageProps) {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold">{camp.name ?? "Unnamed Camp"}</h1>
+
       <pre className="mt-6 whitespace-pre-wrap rounded bg-gray-100 p-4 text-sm text-black">
         {JSON.stringify(camp, null, 2)}
       </pre>
