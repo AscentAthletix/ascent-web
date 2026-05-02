@@ -42,7 +42,7 @@ export default async function CampPage({ params }: PageProps) {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">{camp.name ?? "Unnamed Camp"}</h1>
+      <h1 className="text-2xl font-bold">{camp.title ?? "Unnamed Camp"}</h1>
 
       <pre className="mt-6 whitespace-pre-wrap rounded bg-gray-100 p-4 text-sm text-black">
         {JSON.stringify(camp, null, 2)}
