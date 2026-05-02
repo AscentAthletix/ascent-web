@@ -1,60 +1,119 @@
 @import "tailwindcss";
 
 :root {
-  --ascent-navy: #071629;
-  --ascent-navy-2: #0b1f38;
-  --ascent-green: #33d17a;
-  --ascent-surface: rgba(255, 255, 255, 0.08);
-  --ascent-border: rgba(255, 255, 255, 0.16);
+  --ascent-navy: #071a2c;
+  --ascent-navy-deep: #04111f;
+  --ascent-green: #35d876;
+  --field-white: #f7f8f7;
+  --ascent-gray: #9aa4af;
 }
 
 * { box-sizing: border-box; }
 
 html, body {
-  margin: 0;
   min-height: 100%;
+  margin: 0;
   background: var(--ascent-navy);
   color: white;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Display", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .ascent-bg {
-  min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(51, 209, 122, 0.18), transparent 32rem),
-    linear-gradient(145deg, var(--ascent-navy), var(--ascent-navy-2));
+    radial-gradient(circle at 50% 0%, rgba(53, 216, 118, 0.13), transparent 28rem),
+    linear-gradient(180deg, var(--ascent-navy) 0%, var(--ascent-navy-deep) 100%);
 }
 
-.ascent-card {
-  border: 1px solid var(--ascent-border);
-  background: var(--ascent-surface);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+.ascent-card-dark {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(18px);
 }
 
-.ascent-button {
-  background: var(--ascent-green);
+.ascent-card-light {
+  background: var(--field-white);
   color: var(--ascent-navy);
-  font-weight: 800;
+  border: 1px solid rgba(7, 26, 44, 0.08);
+  box-shadow: 0 20px 50px rgba(7, 26, 44, 0.12);
 }
 
-.ascent-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.ascent-input {
+.ascent-input-underline {
   width: 100%;
+  border: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.45);
   background: transparent;
-  padding: 0.75rem 0;
+  padding: 0.9rem 0;
   color: white;
   outline: none;
+  font-size: 1rem;
 }
 
-.ascent-input::placeholder {
-  color: rgba(255, 255, 255, 0.55);
+.ascent-input-underline::placeholder { color: rgba(255, 255, 255, 0.58); }
+.ascent-input-underline:focus { border-bottom-color: var(--ascent-green); }
+
+.ascent-input-card {
+  width: 100%;
+  border: 1px solid rgba(7, 26, 44, 0.08);
+  background: white;
+  color: var(--ascent-navy);
+  border-radius: 0.9rem;
+  padding: 0.95rem 1rem;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(7, 26, 44, 0.05);
+}
+
+.ascent-input-card::placeholder { color: rgba(7, 26, 44, 0.45); }
+.ascent-input-card:focus { border-color: var(--ascent-green); }
+
+.ascent-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 0;
+  border-radius: 0.9rem;
+  background: var(--ascent-green);
+  color: white;
+  font-weight: 800;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(53, 216, 118, 0.25);
+}
+
+.ascent-primary-button:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.ascent-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(7, 26, 44, 0.12);
+  background: white;
+  color: var(--ascent-navy);
+  font-weight: 800;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+}
+
+.ascent-role-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(7, 26, 44, 0.1);
+  background: white;
+  padding: 1rem;
+  text-align: left;
+  color: var(--ascent-navy);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.ascent-role-card:hover,
+.ascent-role-card[data-selected="true"] {
+  border-color: var(--ascent-green);
+  box-shadow: 0 16px 34px rgba(7, 26, 44, 0.13);
+  transform: translateY(-1px);
 }

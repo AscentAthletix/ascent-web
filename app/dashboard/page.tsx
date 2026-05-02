@@ -1,58 +1,87 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+"use client";
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/browser";
+import { type Profile } from "@/lib/ascent";
 
-  if (!userData.user) redirect("/login");
+export default function DashboardPage() {
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id,email,user_role,first_name,last_name,onboarding_completed,ascent_id")
-    .eq("id", userData.user.id)
-    .maybeSingle();
+  useEffect(() => {
+    async function load() {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        router.replace("/login");
+        return;
+      }
 
-  if (!profile?.onboarding_completed) redirect("/onboarding");
+      const { data } = await supabase
+        .from("profiles")
+        .select("id,email,user_role,onboarding_completed,first_name,last_name,ascent_id")
+        .eq("id", userData.user.id)
+        .maybeSingle<Profile>();
+
+      if (!data || data.onboarding_completed !== true || !data.user_role) {
+        router.replace("/onboarding");
+        return;
+      }
+
+      setProfile(data);
+      setLoading(false);
+    }
+
+    load();
+  }, [router, supabase]);
 
   async function signOut() {
-    "use server";
-    const supabase = await createClient();
     await supabase.auth.signOut();
-    redirect("/login");
+    router.replace("/login");
+    router.refresh();
   }
 
-  return (
-    <main className="ascent-bg min-h-screen px-6 py-10">
-      <section className="mx-auto max-w-5xl">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.35em] text-white/55">Ascent Dashboard</p>
-            <h1 className="mt-3 text-4xl font-black">Welcome, {profile.first_name}</h1>
-            <p className="mt-2 text-white/65">Role: {profile.user_role} · Ascent ID: {profile.ascent_id ?? "Not assigned"}</p>
-          </div>
-          <form action={signOut}>
-            <button className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-bold text-white/80" type="submit">
-              Sign Out
-            </button>
-          </form>
-        </div>
+  if (loading) {
+    return (
+      <main className="ascent-bg flex min-h-screen items-center justify-center px-6">
+        <p className="font-bold text-white/75">Loading dashboard...</p>
+      </main>
+    );
+  }
 
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          <div className="ascent-card rounded-3xl p-6">
-            <p className="text-sm text-white/55">Next Build</p>
-            <h2 className="mt-2 text-2xl font-black">Role Dashboard</h2>
-            <p className="mt-3 text-sm text-white/65">Trainer, athlete, parent, and scout dashboards branch from here.</p>
+  const firstName = profile?.first_name || "Athlete";
+  const role = profile?.user_role || "athlete";
+
+  return (
+    <main className="min-h-screen bg-[var(--field-white)] text-[var(--ascent-navy)]">
+      <header className="bg-[var(--ascent-navy)] px-6 pb-8 pt-10 text-white">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.32em] text-white/55">Ascent Athletix</p>
+            <h1 className="mt-2 text-3xl font-black">Welcome, {firstName}</h1>
+            <p className="mt-1 text-sm font-semibold text-white/65">{String(role).toUpperCase()} Dashboard</p>
           </div>
-          <div className="ascent-card rounded-3xl p-6">
-            <p className="text-sm text-white/55">Backend</p>
-            <h2 className="mt-2 text-2xl font-black">Supabase Live</h2>
-            <p className="mt-3 text-sm text-white/65">Auth session and profile data are loaded from your shared backend.</p>
+          <button onClick={signOut} className="rounded-xl border border-white/15 px-4 py-3 text-sm font-extrabold text-white/80" type="button">
+            Sign Out
+          </button>
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-5xl px-6 py-8">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="ascent-card-light rounded-[1.5rem] p-5">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[rgba(7,26,44,0.48)]">Status</p>
+            <h2 className="mt-2 text-2xl font-black">Active</h2>
           </div>
-          <div className="ascent-card rounded-3xl p-6">
-            <p className="text-sm text-white/55">Product</p>
-            <h2 className="mt-2 text-2xl font-black">Ready for Flows</h2>
-            <p className="mt-3 text-sm text-white/65">Next: trainer dashboard, roster, assignments, and activity visibility.</p>
+          <div className="ascent-card-light rounded-[1.5rem] p-5">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[rgba(7,26,44,0.48)]">Ascent ID</p>
+            <h2 className="mt-2 text-2xl font-black">{profile?.ascent_id ?? "—"}</h2>
+          </div>
+          <div className="ascent-card-light rounded-[1.5rem] p-5">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[rgba(7,26,44,0.48)]">Next</p>
+            <h2 className="mt-2 text-2xl font-black">Build Role UI</h2>
           </div>
         </div>
       </section>
